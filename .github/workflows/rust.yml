@@ -43,8 +43,11 @@ jobs:
         uses: tauri-apps/tauri-action@v0
       - name: Echo workspace
         run: echo ${{ github.workspace }}
+      - name: Tar files
+        run: tar -cvf release.tar ${{ github.workspace }}/src-tauri/target/release/bundle
+        
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}
-          path: ${{ github.workspace }}/src-tauri/target/release
+          path: release.tar
