@@ -44,7 +44,7 @@ jobs:
       - name: Echo workspace
         run: echo ${{ github.workspace }}
       - name: Tar files
-        run: tar -cvf release.tar ${{ github.workspace }}/src-tauri/target/release/bundle
+        run: tar -cvf release.tar ${{ github.workspace }}/src-tauri/target/release
         
       - name: Upload artifact
         uses: actions/upload-artifact@v3
