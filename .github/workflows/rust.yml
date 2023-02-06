@@ -10,14 +10,14 @@ jobs:
   release:
     strategy:
       matrix:
-        os: [ windows-latest, macos-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
     name: Build
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Install dependencies (ubuntu only)
-        if: matrix.platform == 'ubuntu-22.04'
+        if: matrix.os == 'ubuntu-latest'
         # You can remove libayatana-appindicator3-dev if you don't use the system tray feature.
         run: |
           sudo apt-get update
@@ -30,21 +30,21 @@ jobs:
         uses: swatinem/rust-cache@v2
         with:
           workspaces: './src-tauri -> target'
-
+    
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
         with:
           node-version: 'lts/*'
           cache: 'yarn' # Set this to npm, yarn or pnpm.
-
       - name: Install app dependencies and build web
         # Remove `&& yarn build` if you build your frontend in `beforeBuildCommand`
         run: yarn && yarn build # Change this to npm, yarn or pnpm.
-
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
+      - name: Echo workspace
+        run: echo ${{ github.workspace }}
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}
-          path: ${{ github.workspace }}/target/release
+          path: ${{ github.workspace }}
