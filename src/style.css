@@ -1,0 +1,7 @@
+body {
+  margin: 0;
+}
+
+video {
+  object-fit: fill !important;
+}
