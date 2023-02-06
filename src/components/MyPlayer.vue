@@ -33,7 +33,7 @@ const state = shallowRef()
 const videoPlayer = ref(null)
 const video_path = ref([])
 const video_index = ref(0)
-const current_video = ref('')
+const current_video = ref("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4")
 
 onMounted(async () => {
   window.addEventListener('resize', updateSize)
