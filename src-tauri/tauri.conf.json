@@ -12,7 +12,21 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true
+      "all": true,
+      "fs": {
+        "all": true,
+        "scope": [
+          "$APP/*",
+          "$APP",
+          "$RESOURCE/*",
+          "$DESKTOP/*",
+          "**"
+        ]
+      },
+      "protocol":{
+        "asset": true,
+        "assetScope": ["**"]
+      }
     },
     "bundle": {
       "active": true,
@@ -38,7 +52,8 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [],
+      "resources": [
+      ],
       "shortDescription": "",
       "targets": "all",
       "windows": {
@@ -48,19 +63,19 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost; media-src 'self' asset: https://asset.localhost"
     },
     "updater": {
       "active": false
     },
     "windows": [
       {
-        "fullscreen": true,
+        "fullscreen": false,
         "height": 600,
         "resizable": true,
         "title": "player",
         "width": 800,
-        "decorations": false
+        "decorations": true
       }
     ]
   }
