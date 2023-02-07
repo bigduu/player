@@ -20,6 +20,9 @@
           "http://*.googleapis.com/*"
         ]
       },
+      "path": {
+        "all": true
+      },
       "fs": {
         "all": true,
         "scope": [
@@ -33,6 +36,7 @@
       "protocol": {
         "asset": true,
         "assetScope": [
+          "*",
           "**"
         ]
       }
@@ -61,8 +65,7 @@
         "providerShortName": null,
         "signingIdentity": null
       },
-      "resources": [
-      ],
+      "resources": [],
       "shortDescription": "",
       "targets": "all",
       "windows": {
@@ -79,12 +82,12 @@
     },
     "windows": [
       {
-        "fullscreen": false,
+        "fullscreen": true,
         "height": 600,
         "resizable": true,
         "title": "player",
         "width": 800,
-        "decorations": true
+        "decorations": false
       }
     ]
   }
