@@ -16,8 +16,7 @@
       "http": {
         "all": true,
         "scope": [
-          "*",
-          "**"
+          "http://**"
         ]
       },
       "path": {
