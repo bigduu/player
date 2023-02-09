@@ -1,11 +1,12 @@
 #![cfg_attr(
-    all(not(debug_assertions), target_os = "windows"),
-    windows_subsystem = "windows"
+all(not(debug_assertions), target_os = "windows"),
+windows_subsystem = "windows"
 )]
 
 use std::env;
 
-use actix_web::{web, App, HttpResponse, HttpServer, Responder};
+use actix_files::NamedFile;
+use actix_web::{App, HttpRequest, HttpResponse, HttpServer, Responder, Result, web};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -14,31 +15,26 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-fn get_video_path() -> Vec<String> {
-    let exe = env::current_exe().unwrap();
-    let dir = env::current_dir().unwrap();
-    let current_dir = dir.to_str().unwrap();
-    let current_exe = exe.to_str().unwrap();
-    println!("current_dir: {}", current_dir);
-    println!("current_exe: {}", current_exe);
-    let entries = std::fs::read_dir(".").unwrap();
-    let mut paths = Vec::new();
-    for entry in entries {
-        let entry = entry.unwrap();
-        let path = entry.path();
-        let path = path.to_str().unwrap().to_string();
-        println!("path: {}", path);
-        if path.ends_with(".mp4") {
+async fn get_video_path() -> Vec<String> {
+    let mut paths = vec![];
+    std::fs::read_dir("/Users/bigduu/Desktop")
+        .unwrap()
+        .for_each(|entry| {
+            let path = entry.unwrap().path();
+            let path = path.to_str().unwrap().to_string();
             paths.push(path);
-        }
-    }
-    paths.push(current_dir.to_string());
-    paths.push(current_exe.to_string());
+        });
     paths
 }
 
 async fn index() -> impl Responder {
     HttpResponse::Ok().body("Hello world!")
+}
+
+async fn download_file(req: HttpRequest) -> Result<NamedFile> {
+    let path = req.match_info().query("filename");
+    let path = format!("/Users/bigduu/Desktop/{}", path);
+    Ok(NamedFile::open(path)?)
 }
 
 #[tokio::main]
@@ -52,10 +48,11 @@ async fn main() -> anyhow::Result<()> {
                         actix_files::Files::new("/static", "/Users/bigduu/Desktop")
                             .show_files_listing(),
                     )
+                    .route("/download/{filename:.*}", web::get().to(download_file))
                     .route("/", web::get().to(index))
             })
-            .bind(("127.0.0.1", 8081))
-            .expect("Can not bind to port 8081");
+                .bind(("127.0.0.1", 8081))
+                .expect("Can not bind to port 8081");
             server.run().await.unwrap();
         })
     });

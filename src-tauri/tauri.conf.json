@@ -16,8 +16,8 @@
       "http": {
         "all": true,
         "scope": [
-          "http://localhost/*",
-          "http://*.googleapis.com/*"
+          "*",
+          "**"
         ]
       },
       "path": {

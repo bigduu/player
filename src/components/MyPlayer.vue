@@ -17,8 +17,7 @@
 <script setup>
 import {defineComponent, onMounted, ref, shallowRef} from 'vue'
 import {VideoPlayer} from '@videojs-player/vue'
-import {BaseDirectory, readDir} from '@tauri-apps/api/fs';
-import { convertFileSrc } from '@tauri-apps/api/tauri';
+import {getVideoList} from '../api/client'
 
 defineComponent({
   components: {
@@ -32,24 +31,23 @@ const player = shallowRef()
 const state = shallowRef()
 const video_path = ref([])
 const video_index = ref(0)
-const current_video = ref("http://127.0.0.1:8081/static/test.mp4")
+const current_video = ref("")
 
 onMounted(async () => {
   window.addEventListener('resize', updateSize)
-  const baseDirPath = BaseDirectory.Desktop;
-  await readDir("", {dir: baseDirPath, recursive: true}).then((files) => {
-    for (const file of files) {
-      if (file.path.includes(".mp4")) {
-        const videoPath = convertFileSrc(file.path)
-        video_path.value.push(videoPath)
-      }
-    }
-  });
+  await fetchVideoList()
 })
+
+const fetchVideoList = async () => {
+  const res = await getVideoList()
+  res.forEach((item) => {
+    video_path.value.push(item)
+    current_video.value = video_path.value[video_index.value]
+  })
+}
 
 const changeVideo = () => {
   video_index.value = (video_index.value + 1) % video_path.value.length
-  console.log(video_path.value[video_index.value])
   current_video.value = video_path.value[video_index.value]
 }
 
