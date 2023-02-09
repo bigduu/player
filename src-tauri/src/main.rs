@@ -12,12 +12,6 @@ use actix_files::NamedFile;
 use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder, Result};
 use tauri::Manager;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
-
 #[tauri::command]
 async fn get_video_path() -> Vec<String> {
     let mut paths = vec![];
@@ -29,6 +23,31 @@ async fn get_video_path() -> Vec<String> {
             paths.push(path);
         });
     paths
+}
+
+#[tauri::command]
+fn exit_fullscreen() {
+    let window_list = WINDOW_LIST.lock().unwrap();
+    let window = window_list.get(0).unwrap();
+    window.set_fullscreen(false);
+}
+
+#[tauri::command]
+fn enter_fullscreen() {
+    let window_list = WINDOW_LIST.lock().unwrap();
+    let window = window_list.get(0).unwrap();
+    window.set_fullscreen(true);
+}
+
+#[tauri::command]
+fn switch_fullscreen() {
+    let window_list = WINDOW_LIST.lock().unwrap();
+    let window = window_list.get(0).unwrap();
+    if window.is_fullscreen().unwrap() {
+        window.set_fullscreen(false);
+    } else {
+        window.set_fullscreen(true);
+    }
 }
 
 async fn index() -> impl Responder {
@@ -92,7 +111,12 @@ async fn main() -> anyhow::Result<()> {
         })
     });
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet, get_video_path])
+        .invoke_handler(tauri::generate_handler![
+            get_video_path,
+            exit_fullscreen,
+            enter_fullscreen,
+            switch_fullscreen
+        ])
         .setup(move |app| {
             let window = app.get_window("main").unwrap();
             WINDOW_LIST.lock().unwrap().push(window);
