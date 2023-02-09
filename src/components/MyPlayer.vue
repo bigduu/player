@@ -18,6 +18,7 @@
 import {defineComponent, onMounted, ref, shallowRef} from 'vue'
 import {VideoPlayer} from '@videojs-player/vue'
 import {getVideoList} from '../api/client'
+import {listen} from '@tauri-apps/api/event'
 
 defineComponent({
   components: {
@@ -44,12 +45,21 @@ const fetchVideoList = async () => {
     video_path.value.push(item)
     current_video.value = video_path.value[video_index.value]
   })
+
+  const unPlay = await listen('play', (event) => {
+    play()
+  })
+
+  const unPause = await listen('pause', (event) => {
+    pause()
+  })
 }
 
 const changeVideo = () => {
   video_index.value = (video_index.value + 1) % video_path.value.length
   current_video.value = video_path.value[video_index.value]
 }
+
 
 const play = () => {
   player.value.play()

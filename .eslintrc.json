@@ -15,5 +15,7 @@
   "plugins": [
     "vue"
   ],
-  "rules": {}
+  "rules": {
+    "no-unused-vars": "off"
+  }
 }
