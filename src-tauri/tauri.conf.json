@@ -13,6 +13,9 @@
   "tauri": {
     "allowlist": {
       "all": true,
+      "process": {
+        "all": true
+      },
       "globalShortcut": {
         "all": true
       },
@@ -73,7 +76,10 @@
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
-        "timestampUrl": ""
+        "timestampUrl": "",
+        "webviewInstallMode": {
+          "type": "offlineInstaller"
+        }
       }
     },
     "security": {
