@@ -3,24 +3,17 @@
   <!-- <button @click="play">Play</button> -->
   <!-- <button @click="pause">Pause</button> -->
   <!-- <button @click="changeVideo">ChangeVideo</button> -->
-  <VideoPlayer
-      ref="videoPlayer"
-      :src="current_video"
-      @mounted="video_mounted"
-      @ended="changeVideo"
-      :width="windowWidth"
-      :height="windowHeight"
-      :options="{autoplay:true,preferFullWindow:true}"
-  />
+  <VideoPlayer ref="videoPlayer" :src="current_video" :loop="true" @mounted="video_mounted" @ended="changeVideo"
+    :width="windowWidth" :height="windowHeight" :options="{ autoplay: true, preferFullWindow: true }" />
 </template>
 
 <script setup>
-import {defineComponent, onMounted, ref, shallowRef} from 'vue'
-import {VideoPlayer} from '@videojs-player/vue'
-import {getVideoList} from '../api/client'
-import {listen} from '@tauri-apps/api/event'
-import {register} from '@tauri-apps/api/globalShortcut'
-import {invoke} from '@tauri-apps/api/tauri'
+import { defineComponent, onMounted, ref, shallowRef } from 'vue'
+import { VideoPlayer } from '@videojs-player/vue'
+import { getVideoList } from '../api/client'
+import { listen } from '@tauri-apps/api/event'
+import { register } from '@tauri-apps/api/globalShortcut'
+import { invoke } from '@tauri-apps/api/tauri'
 import { exit } from '@tauri-apps/api/process';
 
 defineComponent({
@@ -62,27 +55,27 @@ const fetchVideoList = async () => {
     changeVideo()
   })
 
-  await register('Shift+S',async () => {
+  await register('Shift+S', async () => {
     changeVideo()
   })
 
-  await register('Shift+W',async () => {
+  await register('Shift+W', async () => {
     await exit()
   })
 
-  await register('Shift+C',async () => {
+  await register('Shift+C', async () => {
     await invoke('switch_fullscreen')
   })
 
-  await register('Enter',async () => {
+  await register('Enter', async () => {
     await invoke('switch_fullscreen')
   })
 
-  await register('Esc',async () => {
+  await register('Esc', async () => {
     await invoke('exit_fullscreen')
   })
 
-  await register('Shift+P',async () => {
+  await register('Shift+P', async () => {
     if (is_playing.value) {
       pause()
     } else {
