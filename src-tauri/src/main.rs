@@ -8,9 +8,15 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use actix_files::NamedFile;
+use actix_cors::Cors;
+use actix_files::{NamedFile, Files};
 use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder, Result};
 use tauri::Manager;
+use tracing_appender::non_blocking::WorkerGuard;
+use tracing_subscriber::{
+    fmt::{self, Layer},
+    prelude::__tracing_subscriber_SubscriberExt,
+};
 
 #[tauri::command]
 async fn get_video_path() -> Vec<String> {
@@ -90,13 +96,15 @@ lazy_static::lazy_static! {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    let _ = init_tracing();
     tokio::task::spawn_blocking(|| {
         let rt = tokio::runtime::Handle::current();
         rt.block_on(async {
             let server = HttpServer::new(|| {
                 App::new()
+                    .wrap(Cors::permissive())
                     .service(
-                        actix_files::Files::new("/static", "/Users/bigduu/Desktop")
+                        Files::new("/static", "/Users/bigduu/Desktop")
                             .show_files_listing(),
                     )
                     .route("/download/{filename:.*}", web::get().to(download_file))
@@ -106,7 +114,7 @@ async fn main() -> anyhow::Result<()> {
                     .service(change_video)
             })
             .bind(("0.0.0.0", 8082))
-            .expect("Can not bind to port 8081");
+            .expect("Can not bind to port 8082");
             server.run().await.unwrap();
         })
     });
@@ -125,4 +133,16 @@ async fn main() -> anyhow::Result<()> {
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
     Ok(())
+}
+
+fn init_tracing() -> WorkerGuard {
+    let file_appender = tracing_appender::rolling::daily("play_log", "player");
+    let (non_blocking, guard) = tracing_appender::non_blocking(file_appender);
+    let subscriber = fmt::Subscriber::builder()
+        .with_ansi(false)
+        .with_max_level(tracing::Level::DEBUG)
+        .finish()
+        .with(Layer::default().with_writer(non_blocking).with_ansi(false));
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+    guard
 }
