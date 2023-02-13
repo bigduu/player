@@ -105,7 +105,7 @@ async fn main() -> anyhow::Result<()> {
                     .service(pause)
                     .service(change_video)
             })
-            .bind(("127.0.0.1", 8082))
+            .bind(("0.0.0.0", 8082))
             .expect("Can not bind to port 8081");
             server.run().await.unwrap();
         })
