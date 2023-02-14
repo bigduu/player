@@ -6,10 +6,7 @@
 use std::{
     env,
     sync::{Arc, Mutex},
-};
-
-use actix_cors::Cors;
-use actix_files::{NamedFile, Files};
+}; use actix_cors::Cors; use actix_files::{Files, NamedFile};
 use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder, Result};
 use tauri::Manager;
 use tracing_appender::non_blocking::WorkerGuard;
@@ -103,17 +100,14 @@ async fn main() -> anyhow::Result<()> {
             let server = HttpServer::new(|| {
                 App::new()
                     .wrap(Cors::permissive())
-                    .service(
-                        Files::new("/static", "/Users/bigduu/Desktop")
-                            .show_files_listing(),
-                    )
+                    .service(Files::new("/static", "/Users/bigduu/Desktop").show_files_listing())
                     .route("/download/{filename:.*}", web::get().to(download_file))
                     .route("/", web::get().to(index))
                     .service(play)
                     .service(pause)
                     .service(change_video)
             })
-            .bind(("0.0.0.0", 8082))
+            .bind(("127.0.0.1", 8082))
             .expect("Can not bind to port 8082");
             server.run().await.unwrap();
         })
