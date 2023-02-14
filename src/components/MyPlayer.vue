@@ -1,9 +1,6 @@
 /* eslint-disable no-unused-vars */
 <template>
-  <!-- <button @click="play">Play</button> -->
-  <!-- <button @click="pause">Pause</button> -->
-  <!-- <button @click="changeVideo">ChangeVideo</button> -->
-  <VideoPlayer ref="videoPlayer" :src="current_video" :loop="true" @mounted="video_mounted" @ended="changeVideo"
+  <VideoPlayer ref="videoPlayer" :src="current_video" :loop="loop" @mounted="video_mounted" @ended="changeVideo"
     :width="windowWidth" :height="windowHeight" :options="{ autoplay: true, preferFullWindow: true }" />
 </template>
 
@@ -30,11 +27,14 @@ const video_path = ref([])
 const video_index = ref(0)
 const current_video = ref("")
 const is_playing = ref(true)
+const loop = ref(true)
 
 onMounted(async () => {
   window.addEventListener('resize', updateSize)
   await fetchVideoList()
 })
+
+// TODO: Reload video list
 
 const fetchVideoList = async () => {
   const res = await getVideoList()
@@ -42,6 +42,9 @@ const fetchVideoList = async () => {
     video_path.value.push(item)
     current_video.value = video_path.value[video_index.value]
   })
+  if (video_path.value.length > 1) {
+    loop.value = false
+  }
 
   await listen('play', () => {
     play()
@@ -64,10 +67,6 @@ const fetchVideoList = async () => {
   })
 
   await register('Shift+C', async () => {
-    await invoke('switch_fullscreen')
-  })
-
-  await register('Enter', async () => {
     await invoke('switch_fullscreen')
   })
 
