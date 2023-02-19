@@ -31,6 +31,10 @@ onMounted(async () => {
   window.addEventListener('resize', updateSize)
   await fetchVideoList()
 
+  await register('Shift+C', async () => {
+    changeVideo()
+  })
+
   await listen('play', () => {
     play()
   })
