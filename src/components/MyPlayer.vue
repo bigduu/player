@@ -10,8 +10,6 @@ import { VideoPlayer } from '@videojs-player/vue'
 import { getVideoList } from '../api/client'
 import { listen } from '@tauri-apps/api/event'
 import { register } from '@tauri-apps/api/globalShortcut'
-import { invoke } from '@tauri-apps/api/tauri'
-import { exit } from '@tauri-apps/api/process';
 
 defineComponent({
   components: {
@@ -32,6 +30,26 @@ const loop = ref(true)
 onMounted(async () => {
   window.addEventListener('resize', updateSize)
   await fetchVideoList()
+
+  await listen('play', () => {
+    play()
+  })
+
+  await listen('pause', () => {
+    pause()
+  })
+
+  await listen('changeVideo', () => {
+    changeVideo()
+  })
+
+  await register('Space', async () => {
+    if (is_playing.value) {
+      pause()
+    } else {
+      play()
+    }
+  })
 })
 
 // TODO: Reload video list
@@ -46,41 +64,6 @@ const fetchVideoList = async () => {
     loop.value = false
   }
 
-  await listen('play', () => {
-    play()
-  })
-
-  await listen('pause', () => {
-    pause()
-  })
-
-  await listen('changeVideo', () => {
-    changeVideo()
-  })
-
-  await register('Shift+S', async () => {
-    changeVideo()
-  })
-
-  await register('Shift+W', async () => {
-    await exit()
-  })
-
-  await register('Shift+C', async () => {
-    await invoke('switch_fullscreen')
-  })
-
-  await register('Esc', async () => {
-    await invoke('exit_fullscreen')
-  })
-
-  await register('Shift+P', async () => {
-    if (is_playing.value) {
-      pause()
-    } else {
-      play()
-    }
-  })
 }
 
 const changeVideo = () => {
